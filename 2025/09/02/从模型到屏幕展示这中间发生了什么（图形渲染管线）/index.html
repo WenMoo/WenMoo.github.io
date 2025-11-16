@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Wen Mo">
+
+
+
+
+
+<title>从模型到屏幕展示这中间发生了什么（图形渲染管线） | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">不喜的代码乐园</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">文章</a>
+                
+                <a class="menu-item" href="/category">类别</a>
+                
+                <a class="menu-item" href="/tag">标签</a>
+                
+                <a class="menu-item" href="/about">关于</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">不喜的代码乐园</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">文章</a>
+                
+                <a class="menu-item" href="/category">类别</a>
+                
+                <a class="menu-item" href="/tag">标签</a>
+                
+                <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">从模型到屏幕展示这中间发生了什么（图形渲染管线）</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Wen Mo</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 2, 2025&nbsp;&nbsp;18:12:29</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>做游戏的，那么就不能不来了解渲染管线了，理解 “渲染管线的过程”，其重要性，相对于 web 来说，就如理解“从输入URL到页面展示这中间发生了什么”。<br>说到渲染管线可能我们会遇到两个不同的概念：<strong>功能性阶段</strong> 和 <strong>硬件阶段。</strong> 其实两者都描述了渲染管线的组成，不过是角度和侧重点不同。</p>
+<ul>
+<li><strong>功能性阶段</strong>：通常是指渲染管线的抽象阶段，描述了渲染过程需要完成的主要任务，是我们按照渲染过程中实现的基本功能划分概念。</li>
+<li><strong>硬件阶段：</strong> 也称之为GPU硬件管线阶段，是指实际在GPU硬件上执行的阶段。这些阶段可能会和上述的功能性阶段所对应，但也可能不同，因为为它们是根据硬件的设计和优化来定义的。例如，一些现代GPU可能会并行处理多个阶段，或者在硬件上实现一些特定的优化。</li>
+</ul>
+<p>两者的概念，前者能更便于我们理解渲染管线的过程，而后者能帮助我们如何最有效的去利用 GPU硬件资源。这里下文我们从功能性阶段去理解，如下图：</p>
+<p><img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/2374e1e6d90b4a708282dd87d7229e8d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg6bG8X19f6bG8:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjk5MTExNzIxMDc1Mzg4NiJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1763892709&x-orig-sign=Y3F0nxzDPQkhIl1vBEhL0JDeNqs="></p>
+<p>图形渲染一般分为了，四个重要阶段，理解这四个阶段都做了什么，才能清晰的认识到图形是如何展示在我们屏幕上的！</p>
+<ul>
+<li>应用阶段(Application)</li>
+<li>几何阶段(Geometry Processing)</li>
+<li>光栅化阶段(Rasterization)</li>
+<li>像素阶段(Pixel Processing)</li>
+</ul>
+<blockquote>
+<p>在学习这一部分的时候，其实刚开始很难理解里面所说的，最后我发现，因为我本身一直以来是做 2D游戏 前端开发，而这里面的概念是从 3D的视角去介绍的，所以理解起来比较懵逼，但其实只要意识到这一点，你就能很好的去理解为什么了！</p>
+</blockquote>
+<h2 id="一、应用阶段-Application"><a href="#一、应用阶段-Application" class="headerlink" title="一、应用阶段 (Application)"></a>一、应用阶段 (Application)</h2><h3 id="1、是什么："><a href="#1、是什么：" class="headerlink" title="1、是什么："></a>1、是什么：</h3><p>这个阶段通常是在 CPU 发生，处理与渲染相关的应用逻辑，比如我们的碰撞检查，物理效果的模拟等等之类。如今我们游戏开发一般都是使用到游戏引擎比如 cocos &#x2F; Unity 等，引擎中很多这类操作 CPU 的底层操作都帮我们处理好了，使得我们只需要专注效果。</p>
+<p>当所需要计算的都计算完之后，在应用阶段的末端，这些计算好的数据也就是 <strong>渲染图元</strong>（rendering primitive）就会被发送到 GPU 进行处理</p>
+<p>在渲染管线中，我们常说应用阶段是可控的，主要是因为我们在开发中有比较大的自由度来决定如何处理和准备渲染数据。比如我们最常接触到的分层渲染来降低 DrawCall，简单来说我们可以通过修改节点的排列顺序，避免打断合批，或者修改渲染顺序，优化渲染命令排序来减少发送绘制操作等，另外比如物理模拟和碰撞中的时候，我们把物体的包围盒改为包围球，也能提高性能。这些都是在CPU，在应用阶段进行的。而其他阶段通常都是在GPU 上进行，受限于不同厂家GPU和图形API 的限制，实际开发者能操作的并不多~</p>
+<h2 id="二、几何阶段-Geometry-Processing"><a href="#二、几何阶段-Geometry-Processing" class="headerlink" title="二、几何阶段(Geometry Processing)"></a>二、几何阶段(Geometry Processing)</h2><p><img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/6eb1c60f24f5494896b0b7a628cc89ac~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg6bG8X19f6bG8:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjk5MTExNzIxMDc1Mzg4NiJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1763892709&x-orig-sign=89u8pRJNdp3O37u6CSo6QI7odQI="></p>
+<h3 id="1、是什么：-1"><a href="#1、是什么：-1" class="headerlink" title="1、是什么："></a>1、是什么：</h3><p>这个过程通常发生在 GPU 上，将上一阶段的 渲染图元进行 <strong>逐三角形</strong>（per-triangle）和<strong>逐顶点</strong>（per-vertex）操作，输出屏幕空间的顶点信息，说人话就是将 <strong>3D模型数据转换为屏幕可渲染的2D图元</strong>，同时也是大多数情况下，成为渲染性能瓶颈的地方。</p>
+<h3 id="2、细分过程："><a href="#2、细分过程：" class="headerlink" title="2、细分过程："></a>2、细分过程：</h3><p>细分执行过程如上图，可以划分为四步：</p>
+<ul>
+<li><p><strong>顶点着色（vertex shading）</strong></p>
+<ul>
+<li>在顶点着色中，有两个主要任务，计算顶点位置，以及计算那些开发人员想要作为顶点数据进行输出的任何参数（计算输出颜色：确定材质上光照效果）。</li>
+<li>计算顶点位置中，主要是需要把物体的模型空间 -&gt; 世界空间 -&gt; 视图空间</li>
+</ul>
+</li>
+<li><p><strong>投影（projection）</strong></p>
+<ul>
+<li>在这里就是将摄像机的视图空间转化为裁剪空间，为后续裁剪和投射二维做准备。在顶点转化的过程中，引入了齐次坐标系，运用 W分量来衡量订点到摄像机之间的距离。而常见投影方式包含 投射投影（<a target="_blank" rel="noopener" href="https://alunworker.com/Shader/Shader101/index.html#NDC">NDC</a>中，W代表与摄像机的距离,近小远大， 常见3D中） 和 正交投影（<a target="_blank" rel="noopener" href="https://alunworker.com/Shader/Shader101/index.html#NDC">NDC</a>中，W等于1），</li>
+<li>实现透视变形（fov控制）</li>
+<li>完成视锥体到立方体的映射</li>
+<li>计算顶点位置中，主要是需要将 视图空间 -&gt; 裁剪空间</li>
+</ul>
+</li>
+<li><p><strong>裁剪（clipping）</strong></p>
+<ul>
+<li>只有那些完全或者部分位于视图空间的图元才会被发送到下一个阶段处理，然后绘制到屏幕上。在这里，对于部分处于视图空间内的，会被视图空间裁剪，裁剪之后生产新的订点，替代原本视图空间外的订点。</li>
+<li>裁剪过程会通过 <strong>投影矩阵</strong> 将可视空间转化为一个 x、y、z 三个坐标都在 [-1,1] 区间内的 <strong>标准立方体 ，</strong> 所有图元都依据该立方体进行裁剪，最后通过 <strong>透视除法</strong> 将其转化为 <strong>标准化设备坐标</strong></li>
+<li>计算顶点位置中，主要是需要将 裁剪空间 -&gt; NDC 空间</li>
+</ul>
+</li>
+<li><p><strong>屏幕映射（screen mapping）</strong></p>
+<ul>
+<li>这一步输入的坐标是三维坐标系的坐标，屏幕映射的过程是把每个图元的 x，y 坐标转换到屏幕坐标下</li>
+<li>计算顶点位置中，主要是需要将 NDC 空间 -&gt; 屏幕空间</li>
+</ul>
+</li>
+</ul>
+<h2 id="三、光栅化阶段"><a href="#三、光栅化阶段" class="headerlink" title="三、光栅化阶段"></a>三、光栅化阶段</h2><h3 id="1、是什么：-2"><a href="#1、是什么：-2" class="headerlink" title="1、是什么："></a>1、是什么：</h3><p>在上一个阶段对顶点数据进行正确的变换和投影后，当前阶段的目标是，将 <strong>几何图元</strong> 转换为屏幕像素表示，将连续的几何数据离散化为栅格化的图像，也就是光栅化。</p>
+<h3 id="2、细分过程：-1"><a href="#2、细分过程：-1" class="headerlink" title="2、细分过程："></a>2、细分过程：</h3><ul>
+<li><p><strong>三角形设置（triangle set up，也叫做图元装配，primitive assembly）</strong></p>
+<ul>
+<li>该阶段会进行 三角形的微分，边界方程等其他计算，将几何阶段输出的三角形顶点数据转换为<strong>光栅化所需的预计算信息，</strong> 用于下面的 三角形遍历，以及对几何处理阶段产生的各种着色数据进行插值。这个阶段一般会使用固定功能的硬件实现，不受开发者直接控制。</li>
+<li>具体而言就是，在上一个阶段获得的是三角形网格的三个顶点，而要想获得三角形的覆盖面，就得把边界信息计算出来，以便判断像素是否在三角形内，同时做属性插值，为纹理映射、光照计算提供精确的插值参数</li>
+</ul>
+</li>
+<li><p><strong>三角形遍历（triangle traversal）</strong></p>
+<ul>
+<li>遍历基于三角形网格三个顶点坐标计算出的 “包围盒” 内的每一个像素，对每一个位于三角形网格内的像素，生成一个片元，</li>
+<li>利用三角形三个顶点的属性进行插值，来获得每个片元的属性（颜色插值，纹理坐标插值，法线插值），</li>
+<li>片元生成时会插值计算<strong>深度值（z-buffer 值）</strong> ，用于后续的深度测试，也可能会计算透视修正，保证纹理不会因为投影变形而出现拉伸问题</li>
+</ul>
+</li>
+</ul>
+<h2 id="四、像素处理阶段"><a href="#四、像素处理阶段" class="headerlink" title="四、像素处理阶段"></a>四、像素处理阶段</h2><h3 id="1、是什么：-3"><a href="#1、是什么：-3" class="headerlink" title="1、是什么："></a>1、是什么：</h3><p>在上一个阶段后，拿到所有目标像素，当前阶段主要做的是对图元内部的的像素进行逐像素的计算和操作。</p>
+<h3 id="2、细分过程：-2"><a href="#2、细分过程：-2" class="headerlink" title="2、细分过程："></a>2、细分过程：</h3><ul>
+<li><p><strong>像素着色（pixel shading）</strong></p>
+<ul>
+<li>该阶段主要通过传入的片元，计算片元的最终颜色，这个过程中开发人员是能控制，可编程的，常见纹理采样，贴图操作，光线计算等等</li>
+</ul>
+</li>
+<li><p><strong>合并（merging）</strong></p>
+<ul>
+<li>那么在上面拿到输出的颜色后，在合并阶段，<strong>本质处理多物体重叠时候显示优先级的问题</strong></li>
+<li><strong>深度测试：</strong> 对于可见性问题，依赖于 <strong>z-buffer（深度缓冲）</strong> ，更新的时候选择 z-buffer中的z值最小的，说明离相机最近，会挡住比它大的。</li>
+<li><strong>模板测试：</strong> 模板测试是图形渲染管线中一种<strong>基于掩码（Mask）的像素级过滤技术</strong>，它通过一个与屏幕分辨率相同的模板缓冲区（Stencil Buffer）精确控制哪些片元可以写入帧缓冲。可以用来实现遮罩，描边，反射，分区域渲染等效果，具体对片元读取模板值，用设定的比较函数判断是否通过，来决定是保留，丢弃还是更新模板值。</li>
+<li><strong>透明测试：</strong> 它通过<strong>阈值判定</strong>决定像素的保留或丢弃，属于逐片元测试阶段的重要操作</li>
+<li><strong>混合：</strong> 如果片元的 Alpha 值小于 1（透明度），需要和帧缓冲中已有的颜色混合。</li>
+</ul>
+</li>
+<li><p><strong>颜色写入（color write）</strong></p>
+<ul>
+<li>最后一步就是把颜色值写入到帧缓冲中了~</li>
+</ul>
+</li>
+</ul>
+<h2 id="五、补充概念名词"><a href="#五、补充概念名词" class="headerlink" title="五、补充概念名词"></a>五、补充概念名词</h2><h3 id="1、图元、几何图元、渲染图元三个的区别"><a href="#1、图元、几何图元、渲染图元三个的区别" class="headerlink" title="1、图元、几何图元、渲染图元三个的区别:"></a>1、图元、几何图元、渲染图元三个的区别:</h3><ul>
+<li>图元（Primitive）: 图元是指渲染的基本图形，在图形渲染管线中，将几何物体定义为<strong>点、线和三角形</strong>作为基本渲染图元（rendering primitive），任何图像都可以由这三类组合而成，比如我们所见的圆，其实就是数千个三角形组合而成的。</li>
+<li>几何图元（Geometry Primitive）: 这些是由图元组成的，用于描述对象的几何形状。它们是渲染管线中的输入数据，例如顶点数据、纹理坐标、顶点法线和顶点颜色等。</li>
+<li>渲染图元（Rendering Primitive）: 这些是在图形渲染过程中实际被处理的图元。在OpenGL中，渲染图元包括了渲染所需的几何信息，如顶点数据、线段、多边形等，并且它们对应绘图界面上可见的实体。</li>
+</ul>
+<h3 id="2、什么是片元："><a href="#2、什么是片元：" class="headerlink" title="2、什么是片元："></a>2、什么是片元：</h3><p><strong>片元（Fragment）</strong> 是光栅化过程中生成的<strong>潜在像素数据</strong>，它代表屏幕空间中的一个候选像素点，携带了所有计算最终像素颜色所需的信息。</p>
+<blockquote>
+<p><strong>核心关系</strong>：片元是像素的“胚胎”，只有通过所有测试的片元才能成为像素。</p>
+</blockquote>
+<h3 id="3、渲染管线中有多少次坐标系的转化？"><a href="#3、渲染管线中有多少次坐标系的转化？" class="headerlink" title="3、渲染管线中有多少次坐标系的转化？"></a>3、渲染管线中有多少次坐标系的转化？</h3><p>这个问题其实很有意思的，理解这里每次坐标的转化，也是理解整个渲染管线的关键，可以当做一条主干去一步步了解</p>
+<p>具体的过程如下，同时包含了每一次转化的方式</p>
+<p><img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/74784187fbc34f3493586e11f77cbef7~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg6bG8X19f6bG8:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjk5MTExNzIxMDc1Mzg4NiJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1763892709&x-orig-sign=6GEtLZlgs0eKAWITYCnyATS0i0g=" alt="image.png"></p>
+<p>下图我们可以对比看，每一个坐标系的特性</p>
+<p><img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cade3643683c4c8fbfee268f93695027~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg6bG8X19f6bG8:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjk5MTExNzIxMDc1Mzg4NiJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1763892709&x-orig-sign=dkxk/OtxjLQwXFT1blNXDhvYhAo=" alt="image.png"></p>
+<h3 id="4、像素阶段有多少种缓冲区"><a href="#4、像素阶段有多少种缓冲区" class="headerlink" title="4、像素阶段有多少种缓冲区"></a>4、像素阶段有多少种缓冲区</h3><p>一般有三大核心缓冲 <strong>颜色缓冲（Color Buffer）</strong> 、<strong>深度缓冲（Depth Buffer &#x2F; Z-Buffer）</strong> 、<strong>模板缓冲（Stencil Buffer），</strong> 除了此之外还有累计缓冲，实现多重采样，抗锯齿，HDR合成。Alpha 缓冲，单独存储透明度，等等。</p>
+<p><img src="https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/0c7ce0984b0f4c868a89346ae2f6e5b6~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg6bG8X19f6bG8:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjk5MTExNzIxMDc1Mzg4NiJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1763892709&x-orig-sign=AYTbhg86CNWJOJhnUEQh4zEQKEk=" alt="image.png"></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Wen Mo</span>
+                    </p>
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%9B%BE%E5%BD%A2%E6%B8%B2%E6%9F%93/"># 图形渲染</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/11/10/hello-world/">Hello World</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Wen Mo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
