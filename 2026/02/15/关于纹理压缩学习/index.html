@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Wen Mo">
+
+
+
+
+
+<title>关于纹理压缩学习 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">不喜的代码乐园</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">文章</a>
+                
+                <a class="menu-item" href="/category">类别</a>
+                
+                <a class="menu-item" href="/tag">标签</a>
+                
+                <a class="menu-item" href="/about">关于</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">不喜的代码乐园</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">文章</a>
+                
+                <a class="menu-item" href="/category">类别</a>
+                
+                <a class="menu-item" href="/tag">标签</a>
+                
+                <a class="menu-item" href="/about">关于</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">关于纹理压缩学习</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Wen Mo</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">February 15, 2026&nbsp;&nbsp;2:42:14</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="一、开篇简介"><a href="#一、开篇简介" class="headerlink" title="一、开篇简介"></a>一、开篇简介</h3><p>首先一句话概括说明什么是纹理压缩：<strong><font style="color:#DF2A3F;">那就是把未经压缩的图片格式，转化为GPU能直接采样的压缩格式。</font></strong></p>
+<hr>
+<blockquote>
+<p>关于图像文件格式和纹理格式</p>
+<p>1、图像文件格式：BMP、JPG、PNG、TGA</p>
+<p>说明：文件格式 是为了存储到物理磁盘使用的特殊编码格式，GPU 访问不能直接读取文件编码格式的图像文件，CPU 读入后需要特殊的解码操作 然后传输给GPU</p>
+<p>2、纹理格式：R5G6B5，A4R4G4B4，A1R5G5B5，R8G8B8，A8R8G8B8， </p>
+<p>这些是 GPU 可直接采样的 ，但仍然是未压缩纹理，占用显存和带宽较高。</p>
+<p>3、常见的纹理压缩格式包含：ETC，DXT(S3TC)，ASTC，PVRTC，所以说，纹理压缩这种“压缩”并不是我们压缩体积变小的那种</font><strong><font style="color:#DF2A3F;">“存储压缩”</font></strong>，而是改为 GPU 能够直接采样的纹理格式。</p>
+</blockquote>
+<p>那么为什么我们需要纹理压缩，而不是直接使用 PNG 等图像文件格式呢？我们先来看看图片是如何加载的。</p>
+<h3 id="二、图片加载"><a href="#二、图片加载" class="headerlink" title="二、图片加载"></a>二、图片加载</h3><p>下载与读取-&gt; 解码-&gt; 数据传输至GPU -&gt; 渲染 -&gt; 显示</p>
+<ul>
+<li><strong>下载与读取：</strong> 当请求一张图片的时候，一般会从网络或者本地磁盘空间，将图片文件加载到RAM中，方便CPU进行后续处理，图片文件通常为 png，jpg 等压缩格式，较小的资源体积，便于节省存储和优化网络下载带宽。</li>
+<li><strong>解码or直接拷贝：</strong> 但是压缩数据无法直接用于显示，必须经过解码，将其转换成GPU能够处理的未压缩位图（一个包含每个像素颜色信息的像素数组）。这个过程由CPU完成，可能会非常耗时，尤其对于高分辨率图片。而对于纹理格式，已经能够GPU直接处理的格式，而对于 ASTC 等纹理压缩格式，不需要 CPU 解码成 RGBA，而是直接将压缩数据上传到 GPU，由 GPU 在采样时硬件解码。。</li>
+<li><strong>数据传输至GPU：</strong> <font style="color:rgb(75, 75, 75);"> </font>通过图形API(OpenGL或Vulkan)，CPU发送指令，将图片数据从RAM复制到GPU的显存中。</li>
+<li><strong>渲染：</strong> 将收到的纹理数据和绘制指令，经过一系列计算（顶点变化，光栅花，片元着色等等）处理</li>
+<li><strong>显示：</strong> GPU渲染完成的最终图像会被存入一块特定的内存区域——帧缓冲区。显示控制器则会依据垂直同步信号的节奏，逐行从帧缓冲区读取数据，转换为显示器能识别的信号，最终点亮屏幕上的像素</li>
+</ul>
+<p>而整个流程中真正的性能消耗就在中间的几个部分，按照步骤来说，一般来说我们游戏开发中，在第一步一般和图片格式等关系不大，而是和图片资源大小强相关，所以我们往往会压缩图片，使用 tinify 来压缩图片（减色），把图片缩小一本，使用中再放大使用，做到减小图片资源的存储大小，以及合理拆包，减小首包体积，资源预加载等。</p>
+<p>再过来就是解码压缩，也是流程中性能优化的关键，具体流程  (<font style="color:#DF2A3F;">png&#x2F;jpg -&gt; cpu解码 -&gt; RGBA8888 像素等原生纹理格式</font>)，因为解码压缩都是 CPU 运算处理的，图片越大耗时越长，并且占用主线程解码，经典场景就是UI切换界面卡一下，低端机掉帧，渲染耗时长等。而这里我们猜想，为什么不直接使用 <font style="color:#DF2A3F;">RGBA8888 这类原生纹理格式  </font>来呢？这样就不需要解码了，加载时间显著下降，那是因为首先内存上原生纹理格式占用内存很大，其次数据传输时的带宽消耗，也会带来发热等消耗。</p>
+<p>接着是传输到GPU阶段，也就是显存拷贝，如果使用上面说到的原生纹理格式，数据量巨大，会受到内存带宽限制，导致上传耗时增加，并引发功耗和发热问题。</p>
+<p>总结而言，图片加载本质，是一条「CPU ⇄ GPU 的数据搬运链路」，在小游戏&#x2F;移动端的卡顿，大多数问题也都能追溯到图片加载流程。</p>
+<h3 id="三、纹理压缩"><a href="#三、纹理压缩" class="headerlink" title="三、纹理压缩"></a>三、纹理压缩</h3><p>上面了解了图片的格式类型，以及图片的加载流程，其实我们已经能预感在游戏开发中遇到的问题，而纹理压缩就是为了解决上面的问题，<strong><font style="color:#DF2A3F;">用更少的显存 + 更少的带宽，来存一张“看起来几乎一样”的图片，并且 GPU 能直接用它渲染。</font></strong></p>
+<p><strong><font style="color:#DF2A3F;"></font></strong></p>
+<p>而纹理压缩是如何实现的上面的效果的呢？不同于通用图片压缩（PNG，JPEG等压缩存储体积），它专为GPU实时渲染设计。其核心思想是<strong>分块压缩</strong>和<strong>硬件加速解码</strong>：</p>
+<ul>
+<li><strong>分块压缩</strong>：将纹理划分为固定大小的像素块（如4x4、8x8），对每个块独立压缩。这样GPU在采样时只需解码当前需要的块，无需解压整个纹理。</li>
+<li><strong>硬件解码</strong>：压缩格式由GPU硬件直接支持，解码速度极快，几乎不增加渲染开销。</li>
+</ul>
+<p>块压缩纹理不仅降低带宽，还能提高 GPU texture cache 命中率。下面是我们常见主流的纹理压缩格式：</p>
+<!-- 这是一张图片，ocr 内容为：主要支持平台 特点 典型块大小压缩率 格式 跨平台(移动/桌面) 4X4,6X6,8X8,12X12等,压缩率可调. 灵活度高,支持多种位深和块大小,质量与压缩率平衡优秀. ASTC 支持透明通道,是ETC1的升级版,广泛用于ANDROID设备. 4X4块,固定压缩率(约1/6原始RGB大小) ANDROID(OPENGL ES 3.0+) ETC2 4X4块,压缩率较高. 专为POWERVR架构优化,支持2BPP和4BPP两种压缩率. IOS/MACOS (POWERVR GPU) PVRTC 历史悠久,支持多种纹理类型(不透明,透明,法线贴图等).4X4块,压缩率固定(如BC1为1/8). BCN(DXT/S3TC) WINDOWS/桌面游戏 -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/23102657/1770974459185-00d3c552-2753-4dbe-8e8a-c5dbddd4026d.png"></p>
+<p>在 cocos 中我们可以直接配置开启纹理压缩，并且针对不同的平台，配置不同的压缩格式和压缩率，同时也得注意，部分平台在支持多端设备，比如抖音小游戏也支持在 win 上，而这时候，我们小游戏在移动端上往往是使用 ASTC 的压缩格式，在 win 上是不支持的，官方文档也是提示了 PC 上的性能优化是建议我们做 DXT 的支持~只不过 cocos 不支持，需要我们自己去实现。 </p>
+<p>当然，纹理压缩不是没有代价的<del>哪有没有代价的好事</del>纹理压缩后，首先图片质量会下降，但是这个我们可以衡量，比如背景等我们可以压缩比例高一些，而人物等低一些，其次压缩过程会比较耗时，但是这个在压缩过程通常在开发阶段离线完成，也还好。最后是不同硬件支持的格式不同，需做适配，比如上方我们说到移动端和 PC 端。但整体对于游戏的优化收益是非常明显的，特别是对于移动端！最后有些时候可能纹理压缩后，资源大小比之前更大了，那是因为纹理压缩是为 GPU 而生的格式，它不是为了“存小”，而是为了“跑快”。</p>
+<p><strong><font style="color:#DF2A3F;"></font></strong></p>
+<blockquote>
+<p>再次说一遍的就是，png、jpg等存储格式，看起来存储大小小，并不一定是真的小，是需要通过解压，进入显存占用的才是真正的大小。而解压后的原生纹理格式往往巨大！我们有些时使用 TinyPNG 这类工具压缩了 PNG 图片，主要是为的是“传输优化”，而纹理压缩做到的是“运行优化”，这两种往往是同时使用的！</p>
+</blockquote>
+<h3 id="四、减色（存储阶段的优化）"><a href="#四、减色（存储阶段的优化）" class="headerlink" title="四、减色（存储阶段的优化）"></a>四、减色（存储阶段的优化）</h3><p>突然就想到之前大佬说到的一个东西“减色”，当时只听到这个概念，还懵逼的，那就顺带学习一下了，我们很常遇到美术给过来的背景图资源大小非常大的时候，一般会通过 TinyPNG 来压缩图片的大小，那么 TinyPNG 是如何实现的呢？</p>
+<p>那是因为 TinyPNG 会：</p>
+<ul>
+<li>分析整张图真正用到的颜色，把颜色压缩到 256 色甚至更少，用「最接近的颜色」替代，而 人眼对相近颜色不敏感，但文件大小会大幅下降。</li>
+<li>再者就是优化透明区域通道，合并相近透明度，去掉肉眼不可分辨的透明变化，减少 alpha 信息复杂度，</li>
+<li>PNG 是无损格式，但<strong>编码方式很多</strong>，通过重新排列像素，选择更优的 filter，用更高效的 DEFLATE 压缩，不改“图像内容”，只改“怎么存”</li>
+</ul>
+<p>而这个过程的第一步的 “减色”，也就是用更少的颜色去近似的表达原本更多的颜色，这种技术被称作“量化（quantization），因为一张 RGBA 图片理论上可以有：</p>
+<p>R(256) × G(256) × B(256) × A(256) ≈ 4,294,967,296 种组合</p>
+<p>而我们往往一张UI中只用到几十到几百种颜色，而大多数都是相似类似的颜色，造成了大量的数据冗余，而基本所有的减色算法都是寻找一个颜色的基准，来代表相似的颜色，然后将所有原颜色 → 映射到最近的代表色。所以减色并不是“让图片变差”，而是“用更少的信息表达同样的视觉”。</p>
+<blockquote>
+<p>减色只是像素的可选的颜色数，并不会降低图片的分辨率，所以图片在显存中占用的大小也是不会变的，</p>
+</blockquote>
+<p>减色本质上是 <strong>颜色空间压缩，不是像素空间压缩</strong>。  </p>
+<p>通过减色，我们可以大幅的减小了图片的大小，那么除此我们还有有哪些方式去减少图片的存储大小，来优化我们的包体大小，以及网络下载耗时呢？</p>
+<ul>
+<li>减小分辨率，其实一些UI资源缩小一倍分辨率后，再放大来使用是，效果上是可以接受的，比如把图片从1024x1024缩小到512x512，使用的时候再放大二倍使用，那么这张图片不仅存储上缩小了1&#x2F;4，显存上也是同样。</li>
+<li>选择不同的图片格式，一般不需要用到透明区域的，我们使用 JPG 格式的，占用的空间会更加小</li>
+<li>使用图集，减少文件数，合并小资源，能高效的减少优化 IO 请求</li>
+<li>裁剪透明区，很多的 sprite 其实只是中间有内容，裁剪去除透明区域就能优化不少</li>
+<li>有损压缩</li>
+</ul>
+<h3 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h3><p>总结下来其实就两个地方：</p>
+<p><strong>存储优化 &#x3D; 传输效率</strong><br><strong>纹理压缩 &#x3D; 运行性能</strong></p>
+<p>而真正高性能的游戏资源管线，必须同时做好这两件事。</p>
+<blockquote>
+<p>Q&#x2F;A</p>
+<p>为什么 PNG 再小也没用呢？</p>
+<p>其实上面说了~PNG &#x2F; JPG 的体积大小，与进入 GPU 后的显存占用 <strong>没有直接关系</strong>。</p>
+</blockquote>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Wen Mo</span>
+                    </p>
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2026/02/13/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">《重构.改善既有代码的设计》阅读笔记</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Wen Mo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
