@@ -13,7 +13,7 @@
 
 
 
-<title>游戏开发中的工程化 | Hexo</title>
+<title>常用指令/规范备忘录 | Hexo</title>
 
 
 
@@ -203,7 +203,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">游戏开发中的工程化</h1>
+            <h1 class="post-title">常用指令/规范备忘录</h1>
             
                 <div class="post-meta">
                     
@@ -212,7 +212,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">November 23, 2025&nbsp;&nbsp;20:43:40</a>
+                        Date: <a href="#">February 24, 2026&nbsp;&nbsp;23:07:54</a>
                         </span>
                     
                     
@@ -221,13 +221,96 @@
         </header>
 
         <div class="post-content">
-            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>还大学实习的时候，那会学习Web前端，经常听到前端工程化的思路<del>当年也还刚入行吧</del>听着牛逼，但其实也不能理解到底什么地方体现出来<del>，出来工作后转行游戏了，好像这一行更没有什么说法</del>但其实按照我现在的理解，所谓的工程化是为了能更加的自动化，流程化，下面分享点目前用到的一些</p>
-<h2 id="一、打包提示"><a href="#一、打包提示" class="headerlink" title="一、打包提示"></a>一、打包提示</h2><p>其实这个功能很简单，但是又很便捷，在开发中，我们往往完成功能后需要告诉测试，已经修改完成了，并且已经打包了，可以测试了。但是当我们有些时候忙的时候，打完包后忘了告诉测试老师或者策划老师，就对方不知道已经好了没。</p>
-<p>而接入打包机器人提醒这点就很便捷，测试或者策划可以到群里查看是否有打包信息，并且这个接入很简单，往往我们用的企业微信，飞书，钉钉等企业沟通软件，都能创建群聊，并且创建群聊机器人，我们就可以通过群聊机器人来发送打包完成的消息，具体可以参考各类平台的介入方式，这里链接上 <a target="_blank" rel="noopener" href="https://hiflow.tencent.com/document/applications/wwx-robot/#%E5%BA%94%E7%94%A8%E8%B4%A6%E5%8F%B7%E5%92%8C%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE-%E6%88%96%E5%85%B6%E4%BB%96%E7%9B%B8%E5%85%B3">企业微信机器人</a> 的</p>
-<p>而除了提醒这个最基本的功能外，我觉得更主要的是能能记录打包的信息，比如打包的 git节点，使用的 svn 节点，打包的平台，打包的环境，当前打包分支，上传设备等等都能记录非常的便捷和实用！下面可以看一张我们的效果图：</p>
-<p><img src="/2025/11/23/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E5%B7%A5%E7%A8%8B%E5%8C%96/image_01.png" alt="描述"></p>
-<p>这里再补充一下拿到上述参数的方法</p>
-<h2 id="二、jenkins-自动打包"><a href="#二、jenkins-自动打包" class="headerlink" title="二、jenkins 自动打包"></a>二、jenkins 自动打包</h2><p>在开始我们经常打包需要在自己电脑上打包上传，这首先一个问题就是，打包的时候没法去操作修改，相当于硬控了好一段时间，不急的时候还好，能权当休息一下，但是当急忙需要修改版本内容和问题的时候，那简直是刻不容缓！</p>
+            <h2 id="SVN-常用基本命令"><a href="#SVN-常用基本命令" class="headerlink" title="SVN 常用基本命令"></a>SVN 常用基本命令</h2><ol>
+<li><p>从服务器端下载代码到本地</p>
+<ul>
+<li>svn checkout  服务器地址  Users&#x2F;apple&#x2F;Documents&#x2F;code</li>
+<li>指令的意思：将服务器中repository仓库的内容下载到&#x2F;Users&#x2F;apple&#x2F;Documents&#x2F;code目录中</li>
+</ul>
+</li>
+<li><p>更新服务器端代码到本地目录</p>
+<ul>
+<li>进入到目标目录</li>
+<li>svn update</li>
+<li>如果需要切换到指定节点就在后面加上 svn update -r 节点序号</li>
+</ul>
+</li>
+<li><p>提交代码 （之前表不存在的，新添加的）</p>
+<ul>
+<li>进入需要提交的目录</li>
+<li>svn state 查看状态</li>
+<li>svn add 文件</li>
+<li>svn commit -m “修改了XXX文件”</li>
+<li>这个命令会将目标目录下的所有修改都提交到服务器端</li>
+</ul>
+</li>
+<li><p>提交更改过的代码 （之前表存在的，修改的）</p>
+<ul>
+<li>进入需要提交的目录</li>
+<li>svn state 查看状态 ，能看到是有个 M 的</li>
+<li>svn commit -m “修改了XXX文件” path</li>
+<li>这个命令会将目标文件提交上去</li>
+</ul>
+</li>
+<li><p>解决冲突</p>
+<ul>
+<li>进入目标SVN文件夹</li>
+<li>svn revert 冲突相对位置</li>
+<li>svn up</li>
+</ul>
+</li>
+<li><p>账号更新</p>
+<ul>
+<li>通过 svn auth 可以看到当前账号信息地址</li>
+<li>进入文件夹中删除 auth 这个文件夹</li>
+<li>钥匙串-登录中找到关于 svn  的，修改为需要的账号密码</li>
+<li>这会我们正常svn update 就会重新填入了</li>
+</ul>
+</li>
+</ol>
+<h2 id="Git-提交规范"><a href="#Git-提交规范" class="headerlink" title="Git 提交规范"></a>Git 提交规范</h2><p>feat: A new feature<br>壮举：新功能</p>
+<p>fix: A bug fix<br>修复：错误修复</p>
+<p>docs: Documentation only changes<br>docs：仅文档更改</p>
+<p>style: Changes that do not affect the meaning of the<br>样式：不影响代码含义的更改（空格、格式、缺少分号等</p>
+<p>refactor: A code change that neither fixes a bug nor<br>重构：既不修复错误也不添加功能的代码更改</p>
+<p>perf: A code change that improves performance<br>perf：提高性能的代码更改</p>
+<p>test: Adding missing tests or correcting existing tests<br>测试：添加缺失的测试或纠正现有的测试</p>
+<p>build: Changes that affect the build system or external dependencies<br>build：影响构建系统或外部依赖项的更改</p>
+<p>ci: Changes to our CI configuration files and scripts<br>ci：对我们的 CI 配置文件和脚本的更改</p>
+<p>chore: Other changes that dont modify src or test<br>杂项：不修改 src 或测试文件的其他更改</p>
+<p>revert: Reverts a previous commit<br>还原：还原以前的提交</p>
+<h2 id="我的基本命名规范"><a href="#我的基本命名规范" class="headerlink" title="我的基本命名规范"></a>我的基本命名规范</h2><h3 id="1、元素名-属性名"><a href="#1、元素名-属性名" class="headerlink" title="1、元素名&#x2F;属性名"></a>1、元素名&#x2F;属性名</h3><p>1.基本结构，考虑为元素命名其本身的作用或”用意”，达到语义化。不要使用表面形式的命名，命名的方式能描述出正在做的事情。</p>
+<ul>
+<li>[元素作用&#x2F;内容]-[元素类型]</li>
+<li>如:red&#x2F;left&#x2F;big等，而是比如一个搜索的按键：searchBtn ，</li>
+</ul>
+<p>2.补充元素范围，因为我们一个页面可能包含多个按键，甚至说都是一样功能的，我们就需要对其区分，可以给他添加上范围。</p>
+<ul>
+<li>[元素范围]-[元素作用&#x2F;内容]-[元素类型]</li>
+<li>如:搜索按钮: tabelSearchBtn ，登录表单:topLoginBtn，新闻列表下一页: leftNextPageBtn</li>
+</ul>
+<h3 id="2、事件-函数命名"><a href="#2、事件-函数命名" class="headerlink" title="2、事件 &#x2F; 函数命名"></a>2、事件 &#x2F; 函数命名</h3><p>核心原则是：函数名 &#x3D; 函数做了什么</p>
+<p>所以一般能分为四类：</p>
+<ul>
+<li>on ： 事件入口</li>
+<li>handle: 业务处理</li>
+<li>update: 状态更新</li>
+<li>refresh: 全量刷新</li>
+</ul>
+<p>所以比如上面搜索按钮的触发事件的生命周期可以有： </p>
+<blockquote>
+<p>&#x2F;&#x2F; UI 层</p>
+<p>onSearchBtnClick()</p>
+<p>&#x2F;&#x2F; 业务层</p>
+<p>handleSearch()</p>
+<p>&#x2F;&#x2F; 状态层</p>
+<p>updateSearchResult()</p>
+<p>&#x2F;&#x2F; 回调</p>
+<p>onSearchFinished()</p>
+</blockquote>
+<h3 id="3、文件的命名"><a href="#3、文件的命名" class="headerlink" title="3、文件的命名"></a>3、文件的命名</h3><ul>
+<li>驼峰命名+大写开头</li>
+</ul>
 
         </div>
 
@@ -260,10 +343,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2026/02/13/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">《重构.改善既有代码的设计》阅读笔记</a>
             
-            
-            <a class="next" rel="next" href="/2025/09/02/%E4%BB%8E%E6%A8%A1%E5%9E%8B%E5%88%B0%E5%B1%8F%E5%B9%95%E5%B1%95%E7%A4%BA%E8%BF%99%E4%B8%AD%E9%97%B4%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%88%E5%9B%BE%E5%BD%A2%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%EF%BC%89/">从模型到屏幕展示这中间发生了什么（图形渲染管线）</a>
+            <a class="next" rel="next" href="/2026/02/15/%E5%85%B3%E4%BA%8E%E7%BA%B9%E7%90%86%E5%8E%8B%E7%BC%A9%E5%AD%A6%E4%B9%A0/">关于纹理压缩学习</a>
             
         </section>
 
