@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="WenMo">
+
+
+
+
+
+<title>关于接入小游戏多平台渠道 | 不喜的前端乐园</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">不喜的代码乐园</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">文章</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">不喜的代码乐园</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">文章</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">关于接入小游戏多平台渠道</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">WenMo</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">February 25, 2026&nbsp;&nbsp;23:09:51</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h4 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h4><p>目前小游戏往往会涉及多渠道的接入，来增加我们游戏的收入，这里作为开发，来杂七杂八记录这过程中遇到的问题</p>
+<h4 id="二、接入前置"><a href="#二、接入前置" class="headerlink" title="二、接入前置"></a>二、接入前置</h4><p>往往不同的平台有很多不同的必接能力，很多平台也有自己独有的功能，比如抖音的推荐直出，推荐复访，能够实现玩家在刷视频的过程中刷出游戏界面，直接进入游戏玩等等。</p>
+<p>对于必接能力，一般而言会让运营去整理所需要接入的能力，以及他们需要的功能，这部分建议让运营列出需求checkList，排好优先级，然后让策划跟进需求的表现效果，出案子，我们按照优先级开发接入。</p>
+<p>完成必接能力才能确保能在对应平台上审核通过。如果没有运营来处理这部分，那么我们就要根据平台的接入文档去接入了所需。</p>
+<p><font style="color:#DF2A3F;">第一次提审肯定会被各类问题打回，强烈要建议预足时间去处理，完成必接能力后，尽早提审先，也能根据反馈去及时修改。</font></p>
+<h4 id="三、开发注意问题"><a href="#三、开发注意问题" class="headerlink" title="三、开发注意问题"></a>三、开发注意问题</h4><p>1、表格配置不同</p>
+<p>有些时候我们面对不同的渠道的会有不同的策略，相同的一个功能会存在不同的数值，那么我们读取的配置就可能不同，所以读取配置的地方需要有意识的去做统一的接口去获取，那么我们就能从接口处去做处理区分。目前举个例子是 <font style="background-color:#FBDE28;">商店表 </font>的处理，因为体验卡在不同平台的价格是不一同的，而这个价格是我们根据表格去读取的，这里就要封装 <font style="background-color:#FBDE28;">商店表</font> 的获取，不这样做的话，如果多处做区别，非常容易导致下次修改中遗漏等情况的出现。</p>
+<p><img src="/2026/02/25/%E5%85%B3%E4%BA%8E%E6%8E%A5%E5%85%A5%E5%B0%8F%E6%B8%B8%E6%88%8F%E5%A4%9A%E5%B9%B3%E5%8F%B0%E6%B8%A0%E9%81%93/image_03.png" alt="描述"></p>
+<p>2、平台接入要做什么</p>
+<p>我们接入一个渠道，基本包含的三大部分，<font style="color:#DF2A3F;">登录，支付，广告，</font> 分别也是各自平台的 Agent 实现，这些倒是没啥，参考微信的实现就好了，虽然比较繁琐，但是都有迹可循，具体细节就不展开了（参考灏哥的鸿蒙 &#x2F; 淘宝接入有详细的介绍），再过来是<font style="color:#DF2A3F;">平台能力 </font>**的接入，比如也就是各类 API 的检查接入，虽然比如重启游戏的接口，游戏分享的接口，这部分就需要深度体验功能是否都完整可用。再过来的话就是需要处理 <strong><font style="color:#DF2A3F;">平台必接能力 </font></strong>，比如针对抖音就有 侧边栏复访 的必接能力等等，再过来处理我们的 <strong><font style="color:#DF2A3F;">埋点上报事件</font></strong>，我们目前一般是接入数数和引力，这里具体需要接入哪些根据运营所需。致辞应该差不多了，自测一遍后，找测试老师走一遍完整测试就差不多了~</p>
+<blockquote>
+<p>注意平台上不同的系统可能会有不同的问题，在安卓上可行的不代表 IOS 也可行，测试过程中需要检验！其次，根据平台支持的能力，可以去完善对应的打包流程，比如目前微信，抖音，支付宝等都支持打包机打包，这里需要平台有对应的 cli 来执行命令行上传等，如果平台支持可以接入，大大滴优化打包体验~</p>
+</blockquote>
+<p>单独说一说平台能力的处理，一般是建立统一的接口，然后对于每个渠道去实现所需的接口能力，因为往往我们业务开发的人和接入渠道的人都是分开的，所以对外通过接口暴露，对内实现接口功能。所以我们每个平台都有对应的类处理</p>
+<p>举个例子，顶部的状态栏，因为在一些平台关闭按钮旁边还有别的功能按钮，会导致遮挡到我们原本的砖石栏的显示，最开始的问题是在抖音上遇到的，所以直接在业务中判断是抖音平台就缩放为 0.84，但后面不少平台也有类似的情况，那么这个就是针对不同平台的不同处理，就应该将逻辑放到对应平台中去获取。同理比如我们的分享，一些开关（游戏圈是否开启，复制功能等等）</p>
+<p><img src="/2026/02/25/%E5%85%B3%E4%BA%8E%E6%8E%A5%E5%85%A5%E5%B0%8F%E6%B8%B8%E6%88%8F%E5%A4%9A%E5%B9%B3%E5%8F%B0%E6%B8%A0%E9%81%93/image_04.png" alt="描述"></p>
+<p>每一个渠道都用对应的类来做处理实现对应平台相关的能力，因为同样的一个功能，不同平台的具体实现方式有可能是不同的，以及一些配置等。如我们对于是否开启广告，我们只需要在对应平台中去设置开启关闭。归根结底，核心是希望对不同平台的东西和内容都收缩归纳到各自的地方，而不是各种散装，在业务中混乱的分布，这样无论我们是想要处理平台的差异，还是说对于业务中的修改都便捷安全。在业务中穿插各种平台的判断去做处理，绝对是灾难性的！我们无法保证这个东西，以后你还记得，或者换做别人之后还能清楚之前的。</p>
+<h4 id="四、吐槽"><a href="#四、吐槽" class="headerlink" title="四、吐槽"></a>四、吐槽</h4><p>在对接接入不同渠道中，不同渠道总有自己的想法和坑~这部分一方面建议在对应渠道的论坛中查询有没有相关内容，再者最有用的方式是直接沟通对面的技术。</p>
+<h4 id="五、各类平台的问题"><a href="#五、各类平台的问题" class="headerlink" title="五、各类平台的问题"></a>五、各类平台的问题</h4><ul>
+<li><p>抖音</p>
+<ul>
+<li>抖音的测试中，需要打开开发者工具，里面可以指定全平台入口打开指定的版本，这样比如我们再开发版点击侧边栏功能跳转，打开侧边栏后点击入口，就能够跳转的是当前开发版，而不是别的版本。</li>
+</ul>
+</li>
+<li><p><strong>华为</strong></p>
+<ul>
+<li>华为接入的时候其实有三大块部分，华为安卓，华为鸿蒙，华为快应用，接入这三块特别需要注意的是有对数据互通的要求！</li>
+<li>在接入华为快应用的过程中，最坑点是 <strong>登录卡加载的问题</strong>，是因为账号登录成功之后，登录前下载的资源无法访问。如果我们游戏进入前的一些预加载操作等，就会各种异常或者闪退，这里就得确保登录完成前没有下载。</li>
+<li>还有个问题是游戏游玩中会闪退，当时联系华为技术定位到的问题是因为开启了引擎分离（cocos creator 3.8.2），他们内部有部分功能冲突，后面解决方案是关闭引擎分离，具体的修复排查等他们处理了</li>
+<li>注意华为快应用的包，运行的环境还分为 花瓣轻游，以及 快应用加载器，需要注意，可能在两者上会有异同，需要在两者上都运行测试，保证没问题</li>
+</ul>
+</li>
+<li><p><strong>支付宝</strong></p>
+<ul>
+<li>没啥印象深的，印象中的一个是支付宝的支付接入中，有一个 <font style="color:rgb(51, 51, 51);">buyQuantity 的参数，需要符合支付宝中的价格档位</font></li>
+<li>另外支付宝测试中，需要注意的是，我们可以开启联调的设置（右上角里面），不然测试，加桌 &#x2F; 添首 等跳转到外部的功能没有跳转回来这个版本，会跳转到正式的</li>
+<li>注意，支付宝游戏圈的按钮创建不是同步的，不能类似微信那边创建紧跟着显示，打印可以看到一个ready 的参数为 false ，意思按钮的渲染或初始化状态未完全加载完成。这会按钮是没法点击跳转的游戏圈的，这里建议略微延迟一下即可。</li>
+<li>我滴龟龟，游戏圈参数中，有一个类型10的  “<font style="color:rgb(51, 51, 51);background-color:rgba(22, 118, 255, 0.06);">当天(自然日)用户在本圈子访问的时长</font>” 的，注意这里返回的不是时长，而是小于30s返回0，大于等于30s,小于60s返回1，大于等于60s返回2，时长的规则是这样的，2表示超过60秒 并且注意：这个是累计计算的，比如我第一次访问了1秒，第二次访问了29秒，第二次访问之后会返回1</li>
+</ul>
+</li>
+</ul>
+<h4 id="六、各类平台接入-checkList-记录参考"><a href="#六、各类平台接入-checkList-记录参考" class="headerlink" title="六、各类平台接入 checkList 记录参考"></a>六、各类平台接入 checkList 记录参考</h4><p><strong>1、抖音</strong></p>
+<p><img src="/2026/02/25/%E5%85%B3%E4%BA%8E%E6%8E%A5%E5%85%A5%E5%B0%8F%E6%B8%B8%E6%88%8F%E5%A4%9A%E5%B9%B3%E5%8F%B0%E6%B8%A0%E9%81%93/image_01.png" alt="描述"></p>
+<p><strong>2、华为</strong></p>
+<p><img src="/2026/02/25/%E5%85%B3%E4%BA%8E%E6%8E%A5%E5%85%A5%E5%B0%8F%E6%B8%B8%E6%88%8F%E5%A4%9A%E5%B9%B3%E5%8F%B0%E6%B8%A0%E9%81%93/image_02.png" alt="描述"></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>WenMo</span>
+                    </p>
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2026/02/15/%E5%85%B3%E4%BA%8E%E7%BA%B9%E7%90%86%E5%8E%8B%E7%BC%A9%E5%AD%A6%E4%B9%A0/">关于纹理压缩学习</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© WenMo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
