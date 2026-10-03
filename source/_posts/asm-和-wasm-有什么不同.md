@@ -1,5 +1,5 @@
 ---
-title: asm 和 wasm 有什么不同
+title: 学习 asm / wasm 以及在 cocos 中的使用
 date: 2026-10-02 21:58:43
 tags:
 ---
@@ -51,3 +51,9 @@ Wasm 生成的是二进制指令。宿主不把它当脚本来解析，必须实
 选择发生在模块加载时，不是每次播放动画时。两份都打进包里的情况下，引擎启动时看宿主有没有 `WebAssembly`：有就加载 `.wasm`，没有就退回 asm.js。之后的骨骼动画、刚体碰撞都进已经载入的那一份里计算，画到屏幕上仍由 Cocos 的渲染器完成。
 
 淘宝容器补上 Wasm 之后，大量 Spine 动画会走这份更快的计算。动画数量多、骨骼和物理占帧时间明显时，差别更容易看出来。画面和业务脚本仍走原来的路径，整包帧率的提升通常会小于模块本身的加速。
+
+> 需要注意的是，当前 cocos 引擎擎选路在 `shouldUseWasmModule()`：`both` 时看 `sys.hasFeature(Feature.WASM)`。小游戏里这个探测只认微信的 `WXWebAssembly` 和抖音的 `TTWebAssembly`，支付宝直接返回 `false 是没有原生支持的，我们可以在 game.ejs 中做处理，修改探测的返回值，然后接入容器中的 wasm 命名指向。`
+
+![image.png](img_01.png)
+
+![image.png](img_02.png)
