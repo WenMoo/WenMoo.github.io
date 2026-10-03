@@ -13,7 +13,7 @@
 
 
 
-<title>asm 和 wasm 有什么不同 | 不喜的前端乐园</title>
+<title>学习 asm / wasm 以及在 cocos 中的使用 | 不喜的前端乐园</title>
 
 
 
@@ -191,7 +191,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">asm 和 wasm 有什么不同</h1>
+            <h1 class="post-title">学习 asm / wasm 以及在 cocos 中的使用</h1>
             
                 <div class="post-meta">
                     
@@ -226,6 +226,11 @@
 <p>被这条选项影响的是引擎里用 C&#x2F;C++ 写的模块，例如 Spine、物理（Bullet、PhysX、Box2D），以及 WebGPU。小游戏容器都能跑 JavaScript，较新的容器才提供 WebAssembly，所以这些模块要用 Emscripten 编成 asm.js 或 Wasm。</p>
 <p>选择发生在模块加载时，不是每次播放动画时。两份都打进包里的情况下，引擎启动时看宿主有没有 <code>WebAssembly</code>：有就加载 <code>.wasm</code>，没有就退回 asm.js。之后的骨骼动画、刚体碰撞都进已经载入的那一份里计算，画到屏幕上仍由 Cocos 的渲染器完成。</p>
 <p>淘宝容器补上 Wasm 之后，大量 Spine 动画会走这份更快的计算。动画数量多、骨骼和物理占帧时间明显时，差别更容易看出来。画面和业务脚本仍走原来的路径，整包帧率的提升通常会小于模块本身的加速。</p>
+<blockquote>
+<p>需要注意的是，当前 cocos 引擎擎选路在 <code>shouldUseWasmModule()</code>：<code>both</code> 时看 <code>sys.hasFeature(Feature.WASM)</code>。小游戏里这个探测只认微信的 <code>WXWebAssembly</code> 和抖音的 <code>TTWebAssembly</code>，支付宝直接返回 <code>false 是没有原生支持的，我们可以在 game.ejs 中做处理，修改探测的返回值，然后接入容器中的 wasm 命名指向。</code></p>
+</blockquote>
+<p><img src="/2026/10/02/asm-%E5%92%8C-wasm-%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E5%90%8C/img_01.png" alt="image.png"></p>
+<p><img src="/2026/10/02/asm-%E5%92%8C-wasm-%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E5%90%8C/img_02.png" alt="image.png"></p>
 
         </div>
 
